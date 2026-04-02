@@ -1,0 +1,14 @@
+manifestVersion: 1
+name: "@dougschaefer/image-tools"
+version: "2026.04.02.1"
+description: "Image manipulation via ImageMagick and potrace — recolor, resize, format conversion, vector tracing, SVG rasterization, and compositing. Requires ImageMagick and potrace installed locally."
+repository: https://github.com/dougschaefer6/swamp-image-tools
+labels:
+  - image
+  - imagemagick
+  - potrace
+  - svg
+  - vector
+  - graphics
+models:
+  - image_tools/image_tools.ts
