@@ -18,6 +18,17 @@ async function run(
   return { stdout, stderr };
 }
 
+/**
+ * `@dougschaefer/image-tools` model — local image manipulation via
+ * ImageMagick (`magick`/`convert`) and potrace. Info inspects an
+ * image's format, dimensions, color profile, and metadata. Recolor,
+ * resize, and convert wrap the most common ImageMagick operations.
+ * Trace runs potrace over a rasterized input to produce a vector SVG;
+ * Render performs the inverse, rasterizing SVG to PNG via headless
+ * Chromium. Composite layers multiple images with offset and blend
+ * mode controls. All methods require ImageMagick and potrace on PATH;
+ * Render additionally requires chromium-browser.
+ */
 export const model = {
   type: "@dougschaefer/image-tools",
   version: "2026.04.02.1",
