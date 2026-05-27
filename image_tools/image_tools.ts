@@ -31,7 +31,7 @@ async function run(
  */
 export const model = {
   type: "@dougschaefer/image-tools",
-  version: "2026.05.26.1",
+  version: "2026.05.27.1",
   globalArguments: z.object({}),
   resources: {
     image: {
@@ -282,31 +282,34 @@ export const model = {
           ),
       }),
       execute: async (args, context) => {
-        // Convert to PBM bitmap for potrace
-        const pbmPath = args.inputPath.replace(/\.[^.]+$/, ".pbm");
-        await run("convert", [
-          args.inputPath,
-          "-threshold",
-          `${args.threshold}%`,
-          pbmPath,
-        ]);
-
-        await run("potrace", [
-          pbmPath,
-          "-s",
-          "-o",
-          args.outputPath,
-          "--turdsize",
-          String(args.turdsize),
-          "--alphamax",
-          String(args.alphamax),
-        ]);
-
-        // Clean up temp PBM
+        // Convert to PBM bitmap for potrace — use a system temp file so this
+        // works even when the input directory isn't writable.
+        const pbmPath = await Deno.makeTempFile({ suffix: ".pbm" });
         try {
-          await Deno.remove(pbmPath);
-        } catch {
-          // ignore
+          await run("convert", [
+            args.inputPath,
+            "-threshold",
+            `${args.threshold}%`,
+            pbmPath,
+          ]);
+
+          await run("potrace", [
+            pbmPath,
+            "-s",
+            "-o",
+            args.outputPath,
+            "--turdsize",
+            String(args.turdsize),
+            "--alphamax",
+            String(args.alphamax),
+          ]);
+        } finally {
+          // Clean up temp PBM regardless of success or failure
+          try {
+            await Deno.remove(pbmPath);
+          } catch {
+            // ignore — file may not exist if convert itself failed
+          }
         }
 
         // Recolor if requested
@@ -466,6 +469,44 @@ export const model = {
           fileSize: parseInt(size),
         });
         return { dataHandles: [handle] };
+      },
+    },
+  },
+
+  checks: {
+    "imagemagick-available": {
+      description:
+        "Verify ImageMagick (convert/identify/composite) and potrace are on PATH before running image operations.",
+      labels: ["live"],
+      appliesTo: [
+        "trace",
+        "render",
+        "convert",
+        "resize",
+        "recolor",
+        "composite",
+      ],
+      execute: async (_context) => {
+        const errors: string[] = [];
+        for (const bin of ["convert", "identify", "composite", "potrace"]) {
+          try {
+            const proc = new Deno.Command(bin, {
+              args: ["--version"],
+              stdout: "piped",
+              stderr: "piped",
+            });
+            const result = await proc.output();
+            if (!result.success) {
+              errors.push(`${bin} exited non-zero`);
+            }
+          } catch {
+            errors.push(`${bin} not found on PATH`);
+          }
+        }
+        if (errors.length > 0) {
+          return { pass: false, errors };
+        }
+        return { pass: true };
       },
     },
   },
