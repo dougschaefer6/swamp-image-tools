@@ -143,7 +143,7 @@ swamp model method run img composite --input '{
 
 ## Quality and Testing
 
-This extension has been tested against ImageMagick 6.9 and potrace 1.16 on Ubuntu (WSL2) in the American Sound integration lab.
+This extension has been tested against ImageMagick 6.9 and potrace 1.16 on Ubuntu (WSL2) in a production integration lab.
 
 ## License
 
