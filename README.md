@@ -147,4 +147,4 @@ This extension has been tested against ImageMagick 6.9 and potrace 1.16 on Ubunt
 
 ## License
 
-MIT. See [LICENSE](LICENSE) for details.
+MIT. See [LICENSE](LICENSE.txt) for details.

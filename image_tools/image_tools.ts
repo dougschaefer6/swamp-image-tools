@@ -31,7 +31,7 @@ async function run(
  */
 export const model = {
   type: "@dougschaefer/image-tools",
-  version: "2026.06.08.1",
+  version: "2026.06.29.1",
   globalArguments: z.object({}),
   resources: {
     image: {
